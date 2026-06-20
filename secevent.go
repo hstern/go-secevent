@@ -14,6 +14,38 @@
 // or authentication assertion (RFC 8417 §4).
 package secevent
 
+import "time"
+
 // SpecVersion is the RFC 8417 — Security Event Token (SET) version this build
 // implements.
 const SpecVersion = "RFC 8417"
+
+// SET is a decoded RFC 8417 Security Event Token claims set. It is the typed
+// envelope that carries one or more security-event payloads; the events
+// themselves are decoded through the event-type registry.
+//
+// The audience (aud), subject identifier (sub_id), and events claims are added
+// by later building blocks; this type currently models the scalar claims of
+// §2.2.
+type SET struct {
+	// Issuer (iss) identifies the principal that issued the SET. REQUIRED
+	// (RFC 8417 §2.2).
+	Issuer string
+
+	// IssuedAt (iat) is the time at which the SET was issued, carried on the
+	// wire as an RFC 7519 NumericDate. REQUIRED (RFC 8417 §2.2).
+	IssuedAt time.Time
+
+	// JWTID (jti) is a string uniquely identifying the SET; recipients use it
+	// to detect duplicate deliveries. REQUIRED (RFC 8417 §2.2).
+	JWTID string
+
+	// TransactionID (txn) optionally correlates the SET with related events or
+	// requests. OPTIONAL (RFC 8417 §2.2).
+	TransactionID string
+
+	// TimeOfEvent (toe) is the time at which the event(s) conveyed by the SET
+	// occurred, which may differ from IssuedAt. Carried as an RFC 7519
+	// NumericDate. OPTIONAL (RFC 8417 §2.2).
+	TimeOfEvent time.Time
+}
