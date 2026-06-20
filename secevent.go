@@ -24,9 +24,9 @@ const SpecVersion = "RFC 8417"
 // envelope that carries one or more security-event payloads; the events
 // themselves are decoded through the event-type registry.
 //
-// The audience (aud), subject identifier (sub_id), and events claims are added
-// by later building blocks; this type currently models the scalar claims of
-// §2.2.
+// The subject identifier (sub_id) and events claims are added by later
+// building blocks; this type currently models the scalar claims and the
+// audience of §2.2.
 type SET struct {
 	// Issuer (iss) identifies the principal that issued the SET. REQUIRED
 	// (RFC 8417 §2.2).
@@ -39,6 +39,12 @@ type SET struct {
 	// JWTID (jti) is a string uniquely identifying the SET; recipients use it
 	// to detect duplicate deliveries. REQUIRED (RFC 8417 §2.2).
 	JWTID string
+
+	// Audience (aud) identifies the intended recipient(s) of the SET. Carried
+	// on the wire as either a single string or an array of strings (RFC 7519
+	// §4.1.3); an absent or null claim is no audience. OPTIONAL (RFC 8417
+	// §2.2).
+	Audience Audience
 
 	// TransactionID (txn) optionally correlates the SET with related events or
 	// requests. OPTIONAL (RFC 8417 §2.2).
