@@ -28,9 +28,9 @@ const SpecVersion = "RFC 8417"
 // envelope that carries one or more security-event payloads; the events
 // themselves are decoded through the event-type registry.
 //
-// This type models the §2.2 claims as Go fields. Wiring the full claims set
-// across the JSON boundary (Parse and Encode) and the §2.2/§2.3 validation
-// MUSTs are later building blocks.
+// This type models the §2.2 claims as Go fields. Parse decodes the claims set
+// across the JSON boundary into a SET, Validate checks the §2.2/§2.3
+// required-claim MUSTs, and Encode marshals a SET back to the claims-set bytes.
 type SET struct {
 	// Issuer (iss) identifies the principal that issued the SET. REQUIRED
 	// (RFC 8417 §2.2).
