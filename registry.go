@@ -43,9 +43,15 @@ var eventRegistry = struct {
 
 // RegisterEventType registers decode as the decoder for the given event-type
 // URI, making LookupEventType (and the typed-access helpers built on it) able
-// to turn that event's raw payload bytes into a typed Event. An event
-// vocabulary calls this once per event type it defines, customarily from a
-// package init function so a side-effect import wires the whole vocabulary in.
+// to turn that event's raw payload bytes into a typed Event.
+//
+// This is the only registration mechanism. An event vocabulary makes one
+// RegisterEventType call per event type it defines and places those calls in
+// the vocabulary package's init function. The init function is not an
+// alternative to RegisterEventType — it is simply where the call goes, so that
+// a consumer can wire the whole vocabulary in with a single side-effect import
+// (import _ "example.com/your-vocabulary"), the same idiom as database/sql
+// drivers and image-format decoders.
 //
 // Registration is process-wide and permanent: there is no unregister. The uri
 // must be the same string the event's EventTypeURI method returns.
