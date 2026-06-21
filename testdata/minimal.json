@@ -1,0 +1,8 @@
+{
+  "iss": "https://issuer.example.com",
+  "iat": 1458496404,
+  "jti": "minimal-set-0000000000000000",
+  "events": {
+    "https://schemas.example.com/secevent/example/event-type/minimal": {}
+  }
+}

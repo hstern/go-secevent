@@ -1,0 +1,15 @@
+{
+  "iss": "https://scim.example.com",
+  "iat": 1458496404,
+  "jti": "4d3559ec67504aaba65d40b0363faad8",
+  "aud": [
+    "https://scim.example.com/Feeds/98d52461098511e4",
+    "https://scim.example.com/Feeds/5d7604516b1d08641d"
+  ],
+  "events": {
+    "urn:ietf:params:scim:event:create": {
+      "ref": "https://scim.example.com/Users/44f6142df96bd6ab61e7521d9",
+      "attributes": ["id", "name", "userName", "password", "emails"]
+    }
+  }
+}

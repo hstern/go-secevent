@@ -1,0 +1,11 @@
+{
+  "iss": "https://transmitter.example.com",
+  "iat": 1493856000,
+  "jti": "synthetic-single-aud-0001",
+  "aud": "https://receiver.example.com",
+  "events": {
+    "https://schemas.example.com/secevent/example/event-type/typed": {
+      "subject": "alice"
+    }
+  }
+}
