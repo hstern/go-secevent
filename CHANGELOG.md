@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-06-21
+
 ### Changed
 
 - `SubjectAs[T]` and `SET.IssSub` now match the value form of the `sub_id`
@@ -68,7 +70,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (such as OpenID CAEP and RISC) plug in typed decoders while unknown event
   types stay raw.
 
-[Unreleased]: https://github.com/hstern/go-secevent/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hstern/go-secevent/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/hstern/go-secevent/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/hstern/go-secevent/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/hstern/go-secevent/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/hstern/go-secevent/releases/tag/v0.1.0
