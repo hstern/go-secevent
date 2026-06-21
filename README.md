@@ -127,9 +127,12 @@ is held as a `subjectid.SubjectIdentifier`, parsed and validated there.
 ### Register an event type
 
 An event vocabulary (such as OpenID CAEP or RISC) implements the `Event`
-interface for its payload and registers a decoder for its event-type URI,
-customarily from an `init` function so a side-effect import wires the whole
-vocabulary in. Registration is process-wide and permanent.
+interface for its payload and registers a decoder for its event-type URI.
+`RegisterEventType` is the only registration call — place it in the vocabulary
+package's `init` function (`init` is *where* you register, not an alternative
+to registering) so a single side-effect import wires the whole vocabulary in,
+the same idiom as `database/sql` drivers. Registration is process-wide and
+permanent.
 
 ```go
 const sessionRevokedURI = "https://schemas.openid.net/secevent/caep/event-type/session-revoked"
