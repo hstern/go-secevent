@@ -164,9 +164,9 @@ for runnable versions of each flow.
 
 ## Status
 
-**Pre-release (`v0.x`).** Under active development toward `v0.1.0`; the public
-API may change within the `v0.x` series per [SemVer](https://semver.org/).
-Runtime dependencies: the standard library plus `go-subjectid`.
+**`v0.1.0`** — the first tagged release. As a `v0.x` series, the public API may
+still change per [SemVer](https://semver.org/) before `v1.0.0`. Runtime
+dependencies: the standard library plus `go-subjectid`.
 
 ## License
 
