@@ -14,7 +14,11 @@
 // or authentication assertion (RFC 8417 §4).
 package secevent
 
-import "time"
+import (
+	"time"
+
+	"github.com/hstern/go-subjectid"
+)
 
 // SpecVersion is the RFC 8417 — Security Event Token (SET) version this build
 // implements.
@@ -24,9 +28,9 @@ const SpecVersion = "RFC 8417"
 // envelope that carries one or more security-event payloads; the events
 // themselves are decoded through the event-type registry.
 //
-// The subject identifier (sub_id) and events claims are added by later
-// building blocks; this type currently models the scalar claims and the
-// audience of §2.2.
+// This type models the §2.2 claims as Go fields. Wiring the full claims set
+// across the JSON boundary (Parse and Encode) and the §2.2/§2.3 validation
+// MUSTs are later building blocks.
 type SET struct {
 	// Issuer (iss) identifies the principal that issued the SET. REQUIRED
 	// (RFC 8417 §2.2).
@@ -46,6 +50,15 @@ type SET struct {
 	// §2.2).
 	Audience Audience
 
+	// Subject (sub_id) identifies the subject of the security event as an
+	// RFC 9493 Subject Identifier. RFC 8417 predates RFC 9493 and names the
+	// subject with the bare JWT sub claim; the modern Shared Signals suite that
+	// this library serves uses sub_id instead. Parsing and validating the
+	// identifier is delegated to go-subjectid; this package only holds the
+	// field. A nil Subject means the claim is absent. OPTIONAL (RFC 8417 §2.2,
+	// RFC 9493 §3).
+	Subject subjectid.SubjectIdentifier
+
 	// TransactionID (txn) optionally correlates the SET with related events or
 	// requests. OPTIONAL (RFC 8417 §2.2).
 	TransactionID string
@@ -54,4 +67,10 @@ type SET struct {
 	// occurred, which may differ from IssuedAt. Carried as an RFC 7519
 	// NumericDate. OPTIONAL (RFC 8417 §2.2).
 	TimeOfEvent time.Time
+
+	// Events is the SET's payload: a map of event-type URI to the raw bytes of
+	// that event's payload. It is REQUIRED and MUST contain at least one member
+	// (RFC 8417 §2.2); that MUST is enforced at the marshal boundary, not on
+	// this field. Unknown event-type URIs round-trip byte-stably.
+	Events Events
 }
