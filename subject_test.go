@@ -37,12 +37,12 @@ func TestSETSubjectRoundTrip(t *testing.T) {
 		t.Fatalf("subjectid.Parse: %v", err)
 	}
 
-	gotIssSub, ok := got.(*subjectid.IssSubID)
+	gotIssSub, ok := got.(subjectid.IssSubID)
 	if !ok {
-		t.Fatalf("parsed Subject is %T, want *subjectid.IssSubID", got)
+		t.Fatalf("parsed Subject is %T, want subjectid.IssSubID", got)
 	}
-	if *gotIssSub != want {
-		t.Errorf("Subject round-trip = %+v, want %+v", *gotIssSub, want)
+	if gotIssSub != want {
+		t.Errorf("Subject round-trip = %+v, want %+v", gotIssSub, want)
 	}
 	if got.Format() != "iss_sub" {
 		t.Errorf("Format() = %q, want %q", got.Format(), "iss_sub")
@@ -74,8 +74,8 @@ func TestSubjectAsValueForm(t *testing.T) {
 }
 
 // TestSubjectAsPointerForm checks that SubjectAs and IssSub also read the
-// pointer form — the shape Parse produces, since go-subjectid's registry
-// constructors return pointers. This is the asymmetry the accessor absorbs.
+// pointer form — the shape a SET hand-built with *subjectid.IssSubID carries.
+// This is the value/pointer distinction the accessor absorbs.
 func TestSubjectAsPointerForm(t *testing.T) {
 	want := subjectid.IssSubID{Iss: "https://issuer.example.com/", Sub: "145234573"}
 	s := SET{Subject: &want}
@@ -90,8 +90,8 @@ func TestSubjectAsPointerForm(t *testing.T) {
 
 // TestSubjectAsRoundTrip is the acceptance round-trip: a SET built in Go with
 // the value form of the subject, encoded and parsed back, yields an equal
-// subject through the accessor — even though Parse hands back the pointer form.
-// A consumer never has to write a pointer/value type switch.
+// subject through the accessor. A consumer never has to write a pointer/value
+// type switch.
 func TestSubjectAsRoundTrip(t *testing.T) {
 	want := subjectid.IssSubID{Iss: "https://issuer.example.com/", Sub: "145234573"}
 	s := SET{
@@ -114,10 +114,10 @@ func TestSubjectAsRoundTrip(t *testing.T) {
 		t.Fatalf("Parse: %v", err)
 	}
 
-	// Sanity: the parsed subject is the pointer form, which is exactly why the
-	// accessor is needed.
-	if _, ok := parsed.Subject.(*subjectid.IssSubID); !ok {
-		t.Fatalf("parsed Subject is %T, want *subjectid.IssSubID", parsed.Subject)
+	// Sanity: the parsed subject is the value form go-subjectid's Parse returns,
+	// the same form fed in — the accessor still spares consumers the type switch.
+	if _, ok := parsed.Subject.(subjectid.IssSubID); !ok {
+		t.Fatalf("parsed Subject is %T, want subjectid.IssSubID", parsed.Subject)
 	}
 
 	got, ok := parsed.IssSub()

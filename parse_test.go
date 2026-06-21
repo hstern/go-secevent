@@ -159,9 +159,9 @@ func TestParseSubID(t *testing.T) {
 	if got, want := set.Subject.Format(), "iss_sub"; got != want {
 		t.Errorf("Subject.Format() = %q, want %q", got, want)
 	}
-	iss, ok := set.Subject.(*subjectid.IssSubID)
+	iss, ok := set.Subject.(subjectid.IssSubID)
 	if !ok {
-		t.Fatalf("Subject has type %T, want *subjectid.IssSubID", set.Subject)
+		t.Fatalf("Subject has type %T, want subjectid.IssSubID", set.Subject)
 	}
 	if iss.Iss != "https://issuer.example.com/" || iss.Sub != "145234573" {
 		t.Errorf("Subject = {Iss:%q Sub:%q}, want {iss/ 145234573}", iss.Iss, iss.Sub)

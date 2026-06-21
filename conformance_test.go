@@ -222,12 +222,12 @@ func assertSubject(t *testing.T, set *SET, tc conformanceCase) {
 		return
 	}
 
-	got, ok := set.Subject.(*subjectid.IssSubID)
+	got, ok := set.Subject.(subjectid.IssSubID)
 	if !ok {
-		t.Fatalf("Subject is %T, want *subjectid.IssSubID", set.Subject)
+		t.Fatalf("Subject is %T, want subjectid.IssSubID", set.Subject)
 	}
-	if *got != tc.wantSubject {
-		t.Errorf("Subject = %+v, want %+v", *got, tc.wantSubject)
+	if got != tc.wantSubject {
+		t.Errorf("Subject = %+v, want %+v", got, tc.wantSubject)
 	}
 }
 

@@ -6,6 +6,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-21
+
+### Changed
+
+- **Breaking:** Upgraded [`go-subjectid`](https://github.com/hstern/go-subjectid)
+  to v0.2.0, whose `Parse` now returns Subject Identifiers in their value form
+  (for example `subjectid.IssSubID`) rather than the pointer form. A parsed
+  `SET` now holds the same value form a `SET` built in Go holds, so a type
+  switch on `SET.Subject` no longer has to special-case the parsed shape — but
+  code that asserted the parsed subject as `*subjectid.IssSubID` must now assert
+  the value form. The `SubjectAs[T]` and `SET.IssSub` accessors are unchanged:
+  they still return the value form and still absorb a hand-built pointer-form
+  subject, so consumers already using them need no changes. The `SET.Subject`
+  documentation now describes the value form as the parsed type.
+
 ## [0.1.1] - 2026-06-21
 
 ### Added
@@ -42,6 +57,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (such as OpenID CAEP and RISC) plug in typed decoders while unknown event
   types stay raw.
 
-[Unreleased]: https://github.com/hstern/go-secevent/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/hstern/go-secevent/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/hstern/go-secevent/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/hstern/go-secevent/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/hstern/go-secevent/releases/tag/v0.1.0

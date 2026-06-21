@@ -120,12 +120,12 @@ func TestInteropCAEPSessionRevoked(t *testing.T) {
 	}
 
 	wantSubject := subjectid.IssSubID{Iss: "https://idp.example.com/", Sub: "user-7f3e2a"}
-	got, isIssSub := set.Subject.(*subjectid.IssSubID)
+	got, isIssSub := set.Subject.(subjectid.IssSubID)
 	if !isIssSub {
-		t.Fatalf("Subject is %T, want *subjectid.IssSubID", set.Subject)
+		t.Fatalf("Subject is %T, want subjectid.IssSubID", set.Subject)
 	}
-	if *got != wantSubject {
-		t.Errorf("Subject = %+v, want %+v", *got, wantSubject)
+	if got != wantSubject {
+		t.Errorf("Subject = %+v, want %+v", got, wantSubject)
 	}
 
 	event, ok, err := set.Events.Typed(caepSessionRevokedURI)
@@ -189,13 +189,13 @@ func TestInteropRISCAccountDisabled(t *testing.T) {
 	if err != nil {
 		t.Fatalf("decode per-event subject: %v", err)
 	}
-	issSub, isIssSub := subject.(*subjectid.IssSubID)
+	issSub, isIssSub := subject.(subjectid.IssSubID)
 	if !isIssSub {
-		t.Fatalf("per-event subject is %T, want *subjectid.IssSubID", subject)
+		t.Fatalf("per-event subject is %T, want subjectid.IssSubID", subject)
 	}
 	want := subjectid.IssSubID{Iss: "https://idp.example.com/", Sub: "user-7f3e2a"}
-	if *issSub != want {
-		t.Errorf("per-event subject = %+v, want %+v", *issSub, want)
+	if issSub != want {
+		t.Errorf("per-event subject = %+v, want %+v", issSub, want)
 	}
 }
 

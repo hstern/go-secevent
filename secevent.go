@@ -58,12 +58,11 @@ type SET struct {
 	// field. A nil Subject means the claim is absent. OPTIONAL (RFC 8417 §2.2,
 	// RFC 9493 §3).
 	//
-	// The interface's dynamic type depends on how the SET was built: Parse
-	// yields the pointer form (for example *subjectid.IssSubID, because
-	// go-subjectid's registry constructors return pointers), whereas a SET
-	// built in Go naturally holds the value form (subjectid.IssSubID). Use
-	// SubjectAs or IssSub to read the concrete subject without handling both
-	// forms by hand.
+	// Parse yields the value form of the identifier (for example
+	// subjectid.IssSubID), the same form a SET built in Go naturally holds; a
+	// SET may also be hand-built with the pointer form (*subjectid.IssSubID).
+	// Use SubjectAs or IssSub to read the concrete subject without handling
+	// both forms by hand.
 	Subject subjectid.SubjectIdentifier
 
 	// TransactionID (txn) optionally correlates the SET with related events or
