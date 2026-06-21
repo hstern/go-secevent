@@ -101,6 +101,41 @@ func Example_encode() {
 	// {"iss":"https://idp.example.com/","iat":1615305600,"jti":"set-0002","aud":"https://receiver.example.com/","sub_id":{"format":"iss_sub","iss":"https://idp.example.com/","sub":"user-7f3e2a"},"events":{"https://schemas.openid.net/secevent/caep/event-type/session-revoked":{"initiating_entity":"policy"}}}
 }
 
+// ExampleSET_IssSub reads the typed sub_id of a parsed SET. Parse hands back
+// the pointer form of the Subject Identifier (a *subjectid.IssSubID), but
+// IssSub returns the iss_sub value directly, so a consumer never has to handle
+// the pointer/value distinction itself.
+func ExampleSET_IssSub() {
+	// Verified, base64url-decoded claims-set bytes carrying an iss_sub subject.
+	payload := []byte(`{
+		"iss": "https://idp.example.com/",
+		"iat": 1615305600,
+		"jti": "set-0003",
+		"sub_id": {"format": "iss_sub", "iss": "https://idp.example.com/", "sub": "user-7f3e2a"},
+		"events": {
+			"https://example.com/secevent/iss-sub-example/event": {}
+		}
+	}`)
+
+	set, err := secevent.Parse(payload)
+	if err != nil {
+		fmt.Println("parse:", err)
+		return
+	}
+
+	sub, ok := set.IssSub()
+	if !ok {
+		fmt.Println("subject is absent or not iss_sub")
+		return
+	}
+	fmt.Println("iss:", sub.Iss)
+	fmt.Println("sub:", sub.Sub)
+
+	// Output:
+	// iss: https://idp.example.com/
+	// sub: user-7f3e2a
+}
+
 // docExampleEventURI is the event-type URI this example's event vocabulary
 // claims. It is deliberately unique to this documentation example so it never
 // collides with the CAEP/RISC URIs or other test fixtures registered elsewhere
