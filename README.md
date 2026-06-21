@@ -18,7 +18,9 @@ library owns only the claims set: it receives the already-verified, decoded
 claims-set bytes, parses them into a typed `SET`, and encodes them back.
 
 **A SET is not an access token** and must never be treated as an
-authorization or authentication assertion (RFC 8417 §4).
+authorization or authentication assertion (RFC 8417 §4). `Validate` checks
+only that the required claims are present; a validated SET carries no "still
+good for auth" semantics.
 
 It is not a JWT/JOSE stack. The following are deliberately out of scope and
 belong in dedicated libraries:
@@ -34,17 +36,137 @@ belong in dedicated libraries:
 Subject Identifiers (`sub_id`, RFC 9493) are handled by
 [`go-subjectid`](https://github.com/hstern/go-subjectid).
 
-## Status
-
-**Pre-release (`v0.x`).** Under active development toward `v0.1.0`; the public
-API may change within the `v0.x` series per [SemVer](https://semver.org/).
-Runtime dependencies: the standard library plus `go-subjectid`.
-
 ## Install
 
 ```bash
 go get github.com/hstern/go-secevent
 ```
+
+## Quickstart
+
+### Parse and inspect typed events
+
+`Parse` takes the already-verified, already-base64url-decoded claims-set
+bytes (a JOSE/transport layer produces them) and decodes liberally. `Validate`
+checks the §2.2 required-claim MUSTs. `Events.Typed` decodes a known event
+through the registry; an event type this build has not imported stays raw and
+round-trips byte-for-byte.
+
+```go
+payload := []byte(`{
+    "iss": "https://idp.example.com/",
+    "iat": 1615305600,
+    "jti": "set-0001",
+    "aud": "https://receiver.example.com/",
+    "events": {
+        "https://schemas.openid.net/secevent/caep/event-type/session-revoked": {
+            "event_timestamp": 1615305500
+        }
+    }
+}`)
+
+set, err := secevent.Parse(payload)
+if err != nil {
+    return err
+}
+if err := set.Validate(); err != nil {
+    return err // e.g. errors.Is(err, secevent.ErrNoEvents)
+}
+
+for uri := range set.Events.Raw() {
+    event, ok, err := set.Events.Typed(uri)
+    switch {
+    case err != nil:
+        // a registered decoder rejected the payload
+    case ok:
+        // event is the typed value for a registered vocabulary
+        _ = event.EventTypeURI()
+    default:
+        // no decoder registered: the payload stays raw at set.Events.Raw()[uri]
+    }
+}
+```
+
+### Build and encode a SET
+
+`Encode` is the strict half of the library's "liberal unmarshal, strict
+marshal" contract: it calls `Validate` first and refuses to emit a SET that
+is missing a required claim. It does not sign — it emits the claims-set bytes
+a signer wraps in a JWS.
+
+```go
+subject, err := subjectid.Parse([]byte(
+    `{"format":"iss_sub","iss":"https://idp.example.com/","sub":"user-7f3e2a"}`,
+))
+if err != nil {
+    return err
+}
+
+set := &secevent.SET{
+    Issuer:   "https://idp.example.com/",
+    IssuedAt: time.Unix(1615305600, 0),
+    JWTID:    "set-0002",
+    Audience: secevent.Audience{"https://receiver.example.com/"},
+    Subject:  subject,
+    Events: secevent.Events{
+        "https://schemas.openid.net/secevent/caep/event-type/session-revoked": json.RawMessage(`{"initiating_entity":"policy"}`),
+    },
+}
+
+payload, err := set.Encode()
+if err != nil {
+    return err // a required claim was unset
+}
+// payload is the compact JSON claims set, ready for a JOSE signer.
+```
+
+Subject Identifiers come from
+[`go-subjectid`](https://github.com/hstern/go-subjectid): the `sub_id` claim
+is held as a `subjectid.SubjectIdentifier`, parsed and validated there.
+
+### Register an event type
+
+An event vocabulary (such as OpenID CAEP or RISC) implements the `Event`
+interface for its payload and registers a decoder for its event-type URI,
+customarily from an `init` function so a side-effect import wires the whole
+vocabulary in. Registration is process-wide and permanent.
+
+```go
+const sessionRevokedURI = "https://schemas.openid.net/secevent/caep/event-type/session-revoked"
+
+type SessionRevoked struct {
+    InitiatingEntity string `json:"initiating_entity"`
+}
+
+func (SessionRevoked) EventTypeURI() string { return sessionRevokedURI }
+
+func init() {
+    secevent.RegisterEventType(sessionRevokedURI, func(raw json.RawMessage) (secevent.Event, error) {
+        var e SessionRevoked
+        if err := json.Unmarshal(raw, &e); err != nil {
+            return nil, err
+        }
+        return e, nil
+    })
+}
+
+// Once registered, Events.Typed decodes the member into the concrete type:
+//
+//   event, ok, err := set.Events.Typed(sessionRevokedURI)
+//   if ok {
+//       revoked := event.(SessionRevoked)
+//       _ = revoked.InitiatingEntity
+//   }
+```
+
+See the [package examples](https://pkg.go.dev/github.com/hstern/go-secevent#pkg-examples)
+for runnable versions of each flow.
+
+## Status
+
+**Pre-release (`v0.x`).** Under active development toward `v0.1.0`; the public
+API may change within the `v0.x` series per [SemVer](https://semver.org/).
+Runtime dependencies: the standard library plus `go-subjectid`.
 
 ## License
 
