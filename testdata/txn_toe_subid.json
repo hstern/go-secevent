@@ -1,0 +1,22 @@
+{
+  "iss": "https://transmitter.example.com",
+  "iat": 1493856000,
+  "jti": "synthetic-txn-toe-subid-0001",
+  "aud": [
+    "https://receiver.example.com/feed/a",
+    "https://receiver.example.com/feed/b"
+  ],
+  "sub_id": {
+    "format": "iss_sub",
+    "iss": "https://issuer.example.com/",
+    "sub": "145234573"
+  },
+  "txn": "8675309-jenny",
+  "toe": 1493855000,
+  "events": {
+    "https://schemas.example.com/secevent/example/event-type/state-change": {
+      "previous_state": "active",
+      "current_state": "suspended"
+    }
+  }
+}
