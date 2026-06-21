@@ -102,8 +102,7 @@ func Example_encode() {
 }
 
 // ExampleSET_IssSub reads the typed sub_id of a parsed SET. IssSub returns the
-// iss_sub value directly regardless of whether the held identifier is the value
-// or pointer form, so a consumer never has to handle the distinction itself.
+// iss_sub value directly, so a consumer never has to type-assert SET.Subject.
 func ExampleSET_IssSub() {
 	// Verified, base64url-decoded claims-set bytes carrying an iss_sub subject.
 	payload := []byte(`{

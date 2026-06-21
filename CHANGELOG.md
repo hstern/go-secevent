@@ -6,6 +6,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `SubjectAs[T]` and `SET.IssSub` now match the value form of the `sub_id`
+  Subject Identifier only. go-subjectid v0.2.0 made the value form the single
+  dynamic type `Parse` returns and a Go-built `SET` should hold, so the
+  reflection-based pointer-form fallback the accessors carried is unreachable
+  through any supported flow; it is removed along with its `reflect` import. A
+  `SET` hand-built with a `*subjectid.IssSubID` Subject now reports `ok=false`
+  from these accessors instead of being dereferenced. Consumers reading subjects
+  produced by `Parse`, or building SETs with value-form subjects, are unaffected.
+
 ## [0.2.0] - 2026-06-21
 
 ### Changed

@@ -73,18 +73,19 @@ func TestSubjectAsValueForm(t *testing.T) {
 	}
 }
 
-// TestSubjectAsPointerForm checks that SubjectAs and IssSub also read the
-// pointer form — the shape a SET hand-built with *subjectid.IssSubID carries.
-// This is the value/pointer distinction the accessor absorbs.
-func TestSubjectAsPointerForm(t *testing.T) {
-	want := subjectid.IssSubID{Iss: "https://issuer.example.com/", Sub: "145234573"}
-	s := SET{Subject: &want}
+// TestSubjectAsPointerFormUnmatched pins the value-only contract: a SET
+// hand-built with the pointer form of an identifier (*subjectid.IssSubID) is
+// reported as not found rather than dereferenced. go-subjectid v0.2.0 made the
+// value form the single shape Parse returns and a Go-built SET should hold, so
+// the accessors match the value form only.
+func TestSubjectAsPointerFormUnmatched(t *testing.T) {
+	s := SET{Subject: &subjectid.IssSubID{Iss: "https://issuer.example.com/", Sub: "145234573"}}
 
-	if got, ok := SubjectAs[subjectid.IssSubID](&s); !ok || got != want {
-		t.Errorf("SubjectAs[IssSubID] = (%+v, %v), want (%+v, true)", got, ok, want)
+	if got, ok := SubjectAs[subjectid.IssSubID](&s); ok {
+		t.Errorf("SubjectAs[IssSubID] with pointer-form Subject = (%+v, true), want ok false", got)
 	}
-	if got, ok := s.IssSub(); !ok || got != want {
-		t.Errorf("IssSub() = (%+v, %v), want (%+v, true)", got, ok, want)
+	if got, ok := s.IssSub(); ok {
+		t.Errorf("IssSub() with pointer-form Subject = (%+v, true), want ok false", got)
 	}
 }
 
@@ -147,8 +148,8 @@ func TestSubjectAsMismatch(t *testing.T) {
 
 	t.Run("typed nil subject", func(t *testing.T) {
 		// A typed nil pointer in the interface is not == nil, so it slips past
-		// the s.Subject == nil guard and reaches the reflection path; the
-		// !rv.IsNil() check is what keeps rv.Elem() from panicking.
+		// the s.Subject == nil guard; the value-form type assertion then fails
+		// without dereferencing it, so there is no panic.
 		var p *subjectid.IssSubID
 		s := SET{Subject: p}
 		if got, ok := SubjectAs[subjectid.IssSubID](&s); ok {
