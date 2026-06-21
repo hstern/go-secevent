@@ -59,10 +59,8 @@ type SET struct {
 	// RFC 9493 §3).
 	//
 	// Parse yields the value form of the identifier (for example
-	// subjectid.IssSubID), the same form a SET built in Go naturally holds; a
-	// SET may also be hand-built with the pointer form (*subjectid.IssSubID).
-	// Use SubjectAs or IssSub to read the concrete subject without handling
-	// both forms by hand.
+	// subjectid.IssSubID), the same form a SET built in Go holds. Use SubjectAs
+	// or IssSub to read the concrete subject as its typed value.
 	Subject subjectid.SubjectIdentifier
 
 	// TransactionID (txn) optionally correlates the SET with related events or

@@ -23,7 +23,7 @@ func TestEncodeFullyPopulated(t *testing.T) {
 		IssuedAt: time.Unix(1700000000, 0).UTC(),
 		JWTID:    "abc123",
 		Audience: Audience{"https://rp.example.com"},
-		Subject: &subjectid.IssSubID{
+		Subject: subjectid.IssSubID{
 			Iss: "https://issuer.example.com/",
 			Sub: "145234573",
 		},
